@@ -6,10 +6,12 @@ Up to 8 scientists share a lab. Each round is one experiment in a 3D lab: everyo
 
 | Level | For | Example (Float or Sink?) |
 | --- | --- | --- |
-| 🌱 Sprout | age 5+ | Will the rubber duck float or sink? (read aloud, picture answers) |
+| 🌱 Sprout | age 5+ | Will the rubber duck float or sink? (picture answers) |
 | 🔍 Explorer | age 8+ | Three things drop into the water. Which one will float? |
 | ⚡ Whiz | age 10+ | Very salty water is 1.2 g/cm³. The egg is 1.03 g/cm³. Float or sink? |
 | 🎓 Professor | grown-ups | How much of an iceberg hides below the surface? |
+
+Every question, and then its answer and explanation, is read out loud at every level (the 🔊 button turns sound off).
 
 Right answers score points (a few more for speed) and add fuel to the team's rocket. After seven experiments it launches: the more the team got right, the higher it flies, from a hop off the pad to Mars.
 

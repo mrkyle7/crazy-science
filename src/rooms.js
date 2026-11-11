@@ -15,7 +15,9 @@
 
 const { EXPERIMENTS, makeQuestion, shuffled } = require('./questions');
 
-const TIMES = { intro: 4500, question: 30000, reveal: 12000, allAnswered: 900, emptyRoom: 5 * 60 * 1000 };
+// The reveal is long enough for the experiment to run and for the answer and
+// its explanation to be read out (the page reads everything aloud).
+const TIMES = { intro: 4500, question: 30000, reveal: 16000, allAnswered: 900, emptyRoom: 5 * 60 * 1000 };
 const MAX_PLAYERS = 8;
 const LOOKS = 8;
 const CODE_LETTERS = 'BCDFGHJKLMNPQRSTVWXZ';
