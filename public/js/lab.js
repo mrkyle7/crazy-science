@@ -209,16 +209,16 @@ export class Lab {
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
     this.renderer = renderer;
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer.toneMappingExposure = 1.35;
 
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x090a1c);
     this.scene.fog = new THREE.Fog(0x15103a, 26, 70);
     const pmrem = new THREE.PMREMGenerator(renderer);
     this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    this.scene.environmentIntensity = 0.45;
+    this.scene.environmentIntensity = 0.3;
     pmrem.dispose();
 
     this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 900);
@@ -255,7 +255,7 @@ export class Lab {
     const target = new THREE.WebGLRenderTarget(4, 4, { type: THREE.HalfFloatType, samples: 4 });
     this.composer = new EffectComposer(renderer, target);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), 0.42, 0.4, 1.0);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(4, 4), 0.3, 0.35, 1.25);
     this.composer.addPass(this.bloom);
     this.composer.addPass(new OutputPass());
 
@@ -269,8 +269,8 @@ export class Lab {
   // --- Building ----------------------------------------------------------------
 
   buildLights() {
-    this.scene.add(new THREE.HemisphereLight(0xa9bcff, 0x2a1a4a, 0.8));
-    const key = new THREE.DirectionalLight(0xfff1dd, 1.9);
+    this.scene.add(new THREE.HemisphereLight(0xa9bcff, 0x2a1a4a, 0.55));
+    const key = new THREE.DirectionalLight(0xfff1dd, 1.25);
     key.position.set(6, 13, 9);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
@@ -278,7 +278,7 @@ export class Lab {
     key.shadow.bias = -0.0015;
     key.shadow.normalBias = 0.03;
     this.scene.add(key);
-    const rim = new THREE.DirectionalLight(0xb07cff, 0.9);
+    const rim = new THREE.DirectionalLight(0xb07cff, 0.6);
     rim.position.set(-7, 6, -10);
     this.scene.add(rim);
     const stageGlow = new THREE.PointLight(0x7fe9ff, 6, 12, 2);
@@ -401,6 +401,7 @@ export class Lab {
       mesh(new THREE.TorusGeometry(3.22, 0.06, 8, 96), glow(0x7fe9ff, 1.4), 0, STAGE_TOP, 0).rotateX(Math.PI / 2));
     this.bench = new THREE.Group();
     this.bench.position.y = STAGE_TOP + 0.01;
+    this.bench.scale.setScalar(1.2);
     s.add(this.bench);
 
     // Shelves of glowing potions either side.
@@ -573,7 +574,7 @@ export class Lab {
         a.target.set(ROCKET.x + Math.cos(angle) * 4.2 * (n === 1 ? 0 : 1) + (n === 1 ? 3.2 : 0), 0, ROCKET.z + 4.6 + Math.sin(angle) * -1.2);
         a.stageLift = 0;
       } else {
-        const span = Math.min(narrow ? 2.0 : 2.5, 0.5 * (n - 1) + 0.0001);
+        const span = Math.min(narrow ? 2.0 : 2.5, Math.max(1.5, 0.5 * (n - 1)));
         const angle = Math.PI * 1.5 + t * span;
         const rx = narrow ? 3.9 : 5.0;
         a.target.set(Math.cos(angle) * rx + (n === 1 ? rx * 0.82 : 0), 0, Math.sin(angle) * 4.1 + (n === 1 ? 3.2 : 0));
@@ -690,13 +691,14 @@ export class Lab {
       look.set(0, y + 3.4, ROCKET.z);
     } else {
       const lobby = this.phase === 'home' || this.phase === 'lobby';
-      const halfW = lobby ? 3.3 : (this.aspect < 0.9 ? 4.0 : 5.6);
+      const crowd = this.order.length > 3;
+      const halfW = lobby ? 3.3 : (this.aspect < 0.9 ? 4.0 : crowd ? 5.4 : 4.3);
       const halfH = lobby ? 2.2 : 2.9;
       const wide = Math.max(0.4, (this.width - Math.abs(this.sideNow)) / this.width);
-      const d = Math.max(lobby ? 8 : 10.5, halfW / (tan * this.aspect * wide), halfH / (tan * open));
+      const d = Math.max(lobby ? 8 : 9, halfW / (tan * this.aspect * wide), halfH / (tan * open));
       const tilt = lobby ? 0.2 : 0.36;
       const swing = lobby ? sway * 0.4 : sway * 0.05;
-      look.set(0, lobby ? 1.25 : 1.95, 0);
+      look.set(0, lobby ? 1.25 : 1.6, 0);
       pos.set(Math.sin(swing) * d * Math.cos(tilt), look.y + d * Math.sin(tilt), Math.cos(swing) * d * Math.cos(tilt));
     }
     const k = 1 - Math.exp(-dt * (this.flight ? 6 : 2.5));
@@ -747,7 +749,7 @@ export class Lab {
 
   frame() {
     const now = performance.now();
-    const dt = Math.min(0.05, (now - this.last) / 1000);
+    const dt = Math.min(0.25, (now - this.last) / 1000);
     this.watchSpeed(now - this.last);
     this.last = now;
     this.time += dt;
@@ -766,8 +768,10 @@ export class Lab {
     if (this.experiment) {
       const e = this.experiment;
       e.age += dt;
-      e.group.scale.setScalar(ease.back(clamp01(e.age / 0.6)));
-      e.tick(dt, time);
+      e.group.scale.setScalar(ease.back(clamp01(e.age / 0.6)) * (e.group.userData.size || 1));
+      // In small steps, so a slow frame doesn't upset the physics.
+      const steps = Math.ceil(dt / 0.034);
+      for (let i = 1; i <= steps; i++) e.tick(dt / steps, time - dt + (dt * i) / steps);
     }
 
     this.fuelNow = lerp(this.fuelNow, this.fuel, 1 - Math.exp(-dt * 2));

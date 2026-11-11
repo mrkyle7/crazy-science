@@ -3,7 +3,7 @@
 // there's no connection. Everything else goes straight to the network, so a
 // deploy is live on the next visit. Bump OFFLINE_CACHE if offline.html or the
 // files it uses change.
-const OFFLINE_CACHE = 'offline-v1';
+const OFFLINE_CACHE = 'offline-v2';
 const OFFLINE_FILES = ['/offline.html', '/icon.svg'];
 
 self.addEventListener('install', (event) => {

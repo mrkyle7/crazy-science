@@ -292,7 +292,7 @@ const G = { earth: 9.8, moon: 1.62, jupiter: 24.8 };
 
 function dropScene(place, kinds, { h = 5, stopwatch = false, places = null, vacuum = false, g = null } = {}) {
   return {
-    place, h, stopwatch,
+    place, h, stopwatch, vacuum,
     drops: kinds.map((kind, i) => {
       const where = places ? places[i] : place;
       const air = where === 'earth' && !vacuum;

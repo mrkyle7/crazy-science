@@ -1,6 +1,6 @@
 # Crazy Science
 
-A game on **cheetahmoongames.com**, served at **https://crazy-science.cheetahmoongames.com** from the `crazy-science` Cloud Run service. This repo was started from the skeleton in [mrkyle7/cheetahmoongames](https://github.com/mrkyle7/cheetahmoongames) by `scripts/new-game.sh`. So far it only serves a placeholder page.
+A game on **cheetahmoongames.com**, served at **https://crazy-science.cheetahmoongames.com** from the `crazy-science` Cloud Run service. This repo was started from the skeleton in [mrkyle7/cheetahmoongames](https://github.com/mrkyle7/cheetahmoongames) by `scripts/new-game.sh`. It's a live, online science game for mixed ages: up to 8 players in a room each answer a question about the same 3D experiment at their own level (age 5+, 8+, 10+, grown-ups), then watch the experiment run. **[README.md](README.md)** says how it's built and how to add an experiment.
 
 ## Read this first
 
@@ -15,7 +15,7 @@ Check what's done before starting. Ask the user if unsure, and update these boxe
 - [x] Repo created from the skeleton (`scripts/new-game.sh`)
 - [ ] `crazy-science` entry added to `terraform/games.tf` in mrkyle7/cheetahmoongames, merged, and its workflow applied successfully
 - [ ] Card for the game added to `site/public/index.html` in mrkyle7/cheetahmoongames (can be the same pull request)
-- [ ] The game's own icon in `public/icon.svg`, with the PNGs in `public/icons/` rendered from it, and the same art on its home page card
+- [x] The game's own icon in `public/icon.svg`, with the PNGs in `public/icons/` rendered from it, and the same art on its home page card
 - [ ] A push to `main` deployed successfully (Actions → CI/CD). Every push to `main` deploys; there is no setting or repo variable to turn on, so never tell anyone to set one (an old `DEPLOY_ENABLED` variable is gone).
 - [ ] `https://crazy-science.cheetahmoongames.com` loads over HTTPS (the certificate can take 15–60 minutes after the DNS record appears)
 
@@ -34,6 +34,8 @@ Check what's done before starting. Ask the user if unsure, and update these boxe
 - **Installable.** Keep `public/manifest.webmanifest` (name and colours in step with the game), `public/sw.js` and `public/offline.html`, and register the service worker on every page. The service worker must not cache the game itself, only the offline page.
 - **Don't log, store or forward the `userjwt` cookie.** Only `auth.js` reads it, and it only ever sends it back to the accounts service that issued it (to report the players it sees, for the owner's login alerts, and to ask who a parent's children are, `auth.children(req)`). Keep `auth.js` as it is in the skeleton; fixes to it go in mrkyle7/cheetahmoongames first.
 - **Notifications** (telling players it's their turn): build them as "Notifications" in ADDING_A_GAME.md describes. The server makes its own Web Push keys and keeps them in the game's storage; never put them in Secret Manager or GitHub secrets.
+- **Science has to be right.** Every question's answer, fact and 3D reveal must agree with each other and with real science; when unsure, look it up. Level 1 is for five-year-olds: short prompts, two or three options with pictures, read aloud.
+- **three.js comes from `node_modules`,** served at `/vendor/` by `server.js`; nothing loads from a CDN. The page's import map names it, so the Dockerfile must keep installing dependencies.
 - **Instances:** by default up to 3 can run, and players may land on different ones. If players must meet on the same server, for example rooms kept in memory, set `max_instances = 1` (and, for WebSockets, `timeout`, `concurrency` and `session_affinity`) in the games.tf entry. The Boxer does this.
 
 ## Commands
@@ -41,6 +43,7 @@ Check what's done before starting. Ask the user if unsure, and update these boxe
 ```sh
 npm test            # unit tests
 npm start           # http://localhost:8080
+                    # add ?gfx=low to the address for plain graphics (slow machines, headless browsers)
 docker build -t crazy-science . && docker run -p 8080:8080 crazy-science   # the container Cloud Run runs
 ```
 

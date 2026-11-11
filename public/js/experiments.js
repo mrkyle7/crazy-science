@@ -366,7 +366,7 @@ function drop(scene) {
     b.group.add(earth);
   }
   const allVacuum = scene.drops.every((d) => d.k === 0);
-  const tubeGlass = scene.place === 'earth' && allVacuum && !split && scene.drops.length === 2 && !scene.stopwatch;
+  const tubeGlass = scene.vacuum && scene.place === 'earth' && allVacuum && !split && scene.drops.length === 2 && !scene.stopwatch;
   if (tubeGlass) {
     b.group.add(mesh(tube(1.25, 1.25, TOP + 0.3, 32, true), glass(0xd8f3ff, 0.16), 0, (TOP + 0.3) / 2 + 0.05, 0));
     const tag = label('No air inside', { height: 0.26, color: '#dff6ff' });
@@ -604,7 +604,7 @@ function barMagnet(leftPole) {
 function magnet(scene) {
   const b = base();
   b.group.add(mesh(tube(1.5, 1.6, 0.5, 32), mat(0x3a3f66, { roughness: 0.5 }), 0, 0.25, 0),
-    mesh(tube(1.52, 1.52, 0.03, 32), glow(0x7fe9ff, 1.1), 0, 0.5, 0));
+    mesh(new THREE.TorusGeometry(1.5, 0.04, 8, 64), glow(0x7fe9ff, 1.3), 0, 0.5, 0).rotateX(Math.PI / 2));
   const TABLE = 0.52;
 
   if (scene.mode === 'pick') {
@@ -937,6 +937,7 @@ function space(scene) {
     if (sunShown > 0) sunTag.position.set(0, 1.7 + 0.95, 0);
   });
 
+  b.group.userData.size = 0.84;
   return b.finish(() => {
     b.tl.at(0.2, 1.2, (k) => { pace = lerp(1, 0.12, k); });
     const focus = scene.focus;
