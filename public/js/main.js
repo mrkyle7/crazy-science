@@ -311,8 +311,8 @@ function enterPhase(s, was) {
     $('panel').hidden = false;
     $('timer').hidden = false;
     drawQuestion();
-    const myself = s.players.find((p) => p.id === s.you);
-    if (myself?.level === 1 && question && question.picked === null) readAloud();
+    // Every question is read out, at every level.
+    if (question && question.picked === null) readAloud();
   } else if (phase === 'reveal') {
     $('panel').hidden = false;
     $('timer').hidden = true;
@@ -508,8 +508,10 @@ function showResult() {
     if (p.last && p.here) lab.react(p.id, p.last.correct ? 'right' : 'wrong');
   }
   draw();
-  const myself = state.players.find((p) => p.id === state.you);
-  if (myself?.level === 1) speak(`${right ? 'Correct!' : ''} ${r.fact}`);
+  // And so are the answer and why.
+  const verdict = right ? 'Correct!' : r.picked === null ? "Time's up!" : 'Not this time.';
+  const answer = question?.options[r.answer]?.text;
+  speak(`${verdict} ${answer ? `The answer is: ${answer}.` : ''} ${r.fact}`);
 }
 
 function readAloud() {

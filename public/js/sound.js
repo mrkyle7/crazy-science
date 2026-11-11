@@ -77,13 +77,44 @@ export const sound = {
   fanfare() { [523, 523, 523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.13, 0.25, { type: 'triangle', gain: 0.12 })); },
 };
 
+// Units and symbols, the way you'd say them.
+const SAY = [
+  [/g\/cm³/g, ' grams per cubic centimetre'],
+  [/m\/s²/g, ' metres per second squared'],
+  [/km\/h/g, ' kilometres an hour'],
+  [/m\/s/g, ' metres per second'],
+  [/°C/g, ' degrees Celsius'],
+  [/(\d)\s?Ω/g, '$1 ohms'],
+  [/(\d)\s?V\b/g, '$1 volts'],
+  [/(\d)\s?A\b/g, '$1 amps'],
+  [/(\d)\s?W\b/g, '$1 watts'],
+  [/(\d)\s?km\b/g, '$1 kilometres'],
+  [/(\d)\s?m\b/g, '$1 metres'],
+  [/(\d)\s?s\b/g, '$1 seconds'],
+  [/\bg = /g, 'gravity is '],
+  [/²/g, ' squared'],
+  [/½/g, 'half'],
+  [/÷/g, ' divided by '],
+  [/×/g, ' times '],
+  [/≈/g, ' is about '],
+  [/ = /g, ' equals '],
+  [/ \+ /g, ' plus '],
+  [/…/g, ' '],
+];
+
+export function spoken(text) {
+  let out = String(text);
+  for (const [from, to] of SAY) out = out.replace(from, to);
+  return out.replace(/\s+/g, ' ').trim();
+}
+
 export function speak(text) {
   const synth = window.speechSynthesis;
   if (!synth || muted) return;
   try {
     synth.cancel();
-    const say = new SpeechSynthesisUtterance(text);
-    say.rate = 0.92;
+    const say = new SpeechSynthesisUtterance(spoken(text));
+    say.rate = 0.98;
     say.pitch = 1.1;
     say.lang = 'en-GB';
     synth.speak(say);
